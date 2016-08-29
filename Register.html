@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Assignment-Login</title>
+
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <style>
+            html {
+                font-size: 10pt;
+            }
+            .loginform label {
+            	display: block;
+            	color: #999;
+            }
+            .cf:before,
+            .cf:after {
+                content: ""; 
+                display: table;
+            }
+            
+            .cf:after {
+                clear: both;
+            }
+            .cf {
+                *zoom: 1;
+            }
+            :focus {
+            	outline: 0;
+            }
+            .loginform {
+            	width: 410px;
+            	margin: 50px auto;
+            	padding: 25px;
+            	background-color: rgba(250,250,250,0.5);
+            	border-radius: 5px;
+                box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2), 
+                			inset 0px 1px 0px 0px rgba(250, 250, 250, 0.5);
+                border: 1px solid rgba(0, 0, 0, 0.3);
+            }
+            .loginform ul {
+            	padding: 0;
+            	margin: 0;
+            }
+            .loginform li {
+            	display: inline;
+            	float: left;
+            }
+            .loginform input:not([type=button]) {
+            	padding: 5px;
+            	margin-right: 10px;
+            	border: 1px solid rgba(0, 0, 0, 0.3);
+            	border-radius: 3px;
+            	box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 
+            				0px 1px 0px 0px rgba(250, 250, 250, 0.5) ;
+            }
+            .loginform input[type=button] {
+            	border: 1px solid rgba(0, 0, 0, 0.3);
+            	background: #64c8ef; /* Old browsers */
+            	background: -moz-linear-gradient(top,  #64c8ef 0%, #00a2e2 100%); /* FF3.6+ */
+            	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#64c8ef), color-stop(100%,#00a2e2)); /* Chrome,Safari4+ */
+            	background: -webkit-linear-gradient(top,  #64c8ef 0%,#00a2e2 100%); /* Chrome10+,Safari5.1+ */
+            	background: -o-linear-gradient(top,  #64c8ef 0%,#00a2e2 100%); /* Opera 11.10+ */
+            	background: -ms-linear-gradient(top,  #64c8ef 0%,#00a2e2 100%); /* IE10+ */
+            	background: linear-gradient(to bottom,  #64c8ef 0%,#00a2e2 100%); /* W3C */
+            	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#64c8ef', endColorstr='#00a2e2',GradientType=0 ); /* IE6-9 */
+            	color: #fff;
+            	padding: 5px 15px;
+            	margin-right: 0;
+            	margin-top: 15px;
+            	border-radius: 3px;
+            	text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+            }
+        </style>
+        
+        <script>
+            $(document).ready(function() {
+                //console.log( "document loaded" );
+                $('#passwordsNoMatchRegister').hide();
+                $('#registerSuccess').hide();
+                
+                
+            });
+            function validateForm(textbox) {
+                var x = textbox.value;
+                if (x == null || x == "") {
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+            function sendToCheck(){
+                jsonObj = {};
+                $("input[class=reg]").each(function() {
+                    var title = $(this).attr("title");
+                    var value = $(this).val();
+                    jsonObj[title]=value;
+                });
+                
+                var json= JSON.stringify(jsonObj);
+                console.log("checkjson:"+json);
+                var regUrl='http://127.0.0.1:3000/Register/'+json;
+                console.log("url:"+regUrl);
+                $.getJSON(regUrl, function(data) {
+                    console.log("content:"+data);
+                    var userJson = JSON.parse(JSON.stringify(data));
+                    if(userJson.result=="register"){
+                        console.log(userJson.message);
+                        //show the return login page div 
+                        $('#registerSuccess').show();
+                        $('#passwordsNoMatchRegister').hide();
+                    }else{
+                        //show the error message
+                        console.log(userJson.message)
+                        $('#passwordsNoMatchRegister').show();
+                        $('#registerSuccess').hide();
+                    }
+                    //alert("login"+userJson.data.length);
+                });
+                
+            }
+            function Register(){
+                /*var firstname = document.getElementById('txtfirstname');
+                var lastname = document.getElementById('txtlastname');
+                var email = document.getElementById('txtemail');
+                var pwd = document.getElementById('txtpassword');
+                var reg = 0;
+                
+                var warning = document.getElementById('firstnamewarning');
+                if(!validateForm(firstname)){
+                    var warning2 = document.getElementById('firstnamewarning');
+                    warning2.style.visibility='visible';
+                }else{
+                    warning.style.visibility='hidden';
+                    reg=reg+1;
+                }
+                
+                warning = document.getElementById('lastnamewarning');
+                if(!validateForm(lastname)){
+                    warning.style.visibility='visible';
+                }else{
+                    warning.style.visibility='hidden';
+                    reg=reg+1;
+                }
+                
+                warning = document.getElementById('emailwarning');
+                if(!validateForm(email)){
+                    warning.style.visibility='visible';
+                }else{
+                    warning.style.visibility='hidden';
+                    reg=reg+1;
+                }
+                warning = document.getElementById('passwordwrong');
+                if(!validateForm(pwd)){
+                    warning.style.visibility='visible';
+                }else{
+                    warning.style.visibility='hidden';
+                    reg=reg+1;
+                }
+                
+                if(reg==4){
+                    window.location ='Login.html';
+                }*/
+                
+                sendToCheck();
+            }
+        </script>
+    </head>
+
+    <body>
+        
+        <div class="alert alert-danger" id="passwordsNoMatchRegister">
+            <strong>Faile!</strong> <span id="message">There is have same email ,please check the email.</span>
+        </div>
+        <div class="alert alert-success" id="registerSuccess">
+            <strong>Success!</strong> <span id="message">you can click <a href="Login.html">here</a> go to Login .</span>
+        </div>
+        
+        <form class="loginform cf" action="/register" method="POST">
+            
+            <h3><label>Register</label></h3>
+                <label for="firstname">First Name</label>
+                <input type="textbox" id="txtfirstname" name="txtfirstname" placeholder="First Name" class="reg" title="firstname" required>
+                <span id="firstnamewarning" class="help-inline" style="display: none;">Username is taken</span>
+            
+            <div class="controls">
+                <label for="lastname">Last Name</label>
+                <input type="textbox" id="txtlastname" name="txtlastname" placeholder="Last Name" class="reg" title="lastname" required>
+                <span id="lastnamewarning" class="help-inline" style="display: none;">Username is taken</span>
+            </div>
+                <label for="usermail">Email</label>
+                <input type="email" id="txtemail" name="usermail" placeholder="yourname@email.com" class="reg" title="email" required>
+                <span id="emailwarning" class="help-inline" style="display: none;">Username is taken</span>
+
+                <label for="password">Password</label>
+                <input type="password" id="txtpassword" name="password" placeholder="password" class="reg" title="password" required>
+                <span id="passwordwrong" class="help-inline" style="display: none;">Username is taken</span>
+                <!--<p><input type="button" value="Register" onclick="Register()"></p>-->
+                <input type="submit" value="Submit" >
+
+            <!--</form>-->
+        </form>
+        
+    </body>
+</html>

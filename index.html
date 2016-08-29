@@ -1,6 +1,118 @@
 <!DOCTYPE html>
-<html>
-    <body>
-        <p>index 1</p>
+<html lang="en">
+<head>
+    <title id='Description'>Weather Table</title>
+    <link rel="stylesheet" href="jqwidgets/jqwidgets/styles/jqx.base.css" type="text/css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxcore.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxbuttons.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxmenu.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxgrid.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxgrid.selection.js"></script> 
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxgrid.columnsresize.js"></script> 
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxdata.js"></script> 
+    <!--<script type="text/javascript" src="jqwidgets/scripts/demos.js"></script>-->
+    <!-- page-->
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxgrid.pager.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxlistbox.js"></script>
+    <script type="text/javascript" src="jqwidgets/jqwidgets/jqxdropdownlist.js"></script>
+    <!--Angular js-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <!-- Bootstrap style-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript">
+        
+        $(document).ready(function () {
+            var url = "/weather";
+
+            // prepare the data
+            var source =
+            {
+                datatype: "json",
+                datafields: [
+                    { name: 'dt' , map:'res>dt' },
+                    { name: 'CurrentDateTime' ,map:'res>CurrentDateTime'},
+                    { name: 'name' ,map :'res>name'},
+                    { name: 'maintemp' ,map :'res>main>temp'},
+                    { name: 'maintempmin' ,map :'res>main>temp_min'},
+                    { name: 'maintempmax' ,map :'res>main>temp_max'},
+                    { name: 'weathericon' ,map :'res>weather>0>icon'},
+                ],
+                updaterow: function (rowid, rowdata, commit) {
+                    commit(true);
+                },
+                url: url,
+                mapChar:'>',
+                loadComplete: function (data) { },
+                loadError: function (xhr, status, error) { alert('loadError:'+error); }
+            };
+            var dataAdapter = new $.jqx.dataAdapter(source);
+                
+            $("#jqxgrid").jqxGrid(
+            {
+                width: '100%',
+                pageable: true,
+                source: dataAdapter,
+                rowsheight: 60,
+                columnsresize: true,
+                columns: [
+                    { text: 'Date Time', dataField: 'dt', width: 200 ,cellsrenderer: function (row, column, value) {
+                        return '<p>'+timeConverter(value)+'</p>'}},
+                    { text: 'Insert Current Date Time', dataField: 'CurrentDateTime', width: 200 },
+                    { text: 'City Name', dataField: 'name', width: 180 },
+                    { text: 'Temp', dataField: 'maintemp', width: 80 },
+                    { text: 'Temp Min', dataField: 'maintempmin', width: 100},
+                    { text: 'Temp Max', dataField: 'maintempmax', width: 100},
+                    { text: 'Icon', dataField: 'weathericon', width: 80 , cellsrenderer: function (row, column, value) {
+                          return '<img src="https://openweathermap.org/img/w/' + value + '.png"/>'}}
+                //view-source:http://www.jqwidgets.com/jquery-widgets-demo/demos/jqxgrid/customwidgetscolumn.htm?light
+                ]
+            });
+        });
+    
+        
+    function timeConverter(UNIX_timestamp){
+      var a = new Date(UNIX_timestamp * 1000);
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var year = a.getFullYear();
+      var month = months[a.getMonth()];
+      var date = a.getDate();
+      var hour = a.getHours();
+      var min = a.getMinutes();
+      var sec = a.getSeconds();
+      var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+      return time;
+    }
+    //Angular js
+    var app = angular.module('myApp', []);
+    app.controller('cityList', function($scope, $http) {
+      $http.get("/city")
+      .then(function(response) {
+          $scope.citys = response.data;
+          $scope.choice = function(){
+            console.log("1");
+          };
+      });
+    });
+    function scheduleA(event) {
+        var tmpS = $("#jqxgrid").jqxGrid('source');
+        tmpS._source.url = "/weather/"+this.options[this.selectedIndex].text+"/desc";
+        $("#jqxgrid").jqxGrid('source', tmpS);
+    }
+    </script>
+</head>
+    <body class='default'>
+        <div ng-app="myApp" ng-controller="cityList">
+        <a href="/logout" class="btn btn-default" role="button"  style="float:right;">Logout</a>
+            <h2>{{ choice }} Weather List</h2>
+            <select ng-model="choice" onchange="scheduleA.call(this, event)">
+                <option ng-repeat="city in citys" value="{{city.city.name}}">{{city.city.name}}</option>
+            </select>
+        </div>
+        <div id='jqxWidget'>
+            <div id="jqxgrid"></div>
+        </div>
     </body>
 </html>
