@@ -36,8 +36,8 @@ app.listen(post,function(err){
         console.error(err)
     }else{
         console.log('App is ready at :'+post)
-        //later.setInterval(sphinxWeather,timerTask);
-        //later.date.localTime();
+        later.setInterval(sphinxWeather,timerTask);
+        later.date.localTime();
     }
 });
 
