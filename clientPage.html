@@ -16,7 +16,9 @@
             // prepare chart data
             var source =
             {
+                //set get data type
                 datatype: "json",
+                
                 datafields: [
                     { name: 'dt' , map:'res>dt' ,type :'int'},
                     { name: 'CurrentDateTime' ,map:'res>CurrentDateTime'},
@@ -28,6 +30,7 @@
                     { name: 'weathericon' ,map :'res>weather>0>icon'},
                 ],
                 updaterow: function (rowid, rowdata, commit) {
+                    //if call to chart update, it will be reload the adapter
                     commit(true);
                 },
                 url: "/weather/Hong Kong/asc",
@@ -48,19 +51,21 @@
                 showLegend: true,
                 source: dataAdapter,
                 xAxis:
-                    {
+                    {   //x axis show data content 
                         dataField: 'date',
                         type: 'basic'
                     },
                 colorScheme: 'scheme04',
                 seriesGroups:[{
                     type: 'line',
+                    //line style
                     valueAxis:{
                         displayValueAxis: true,
                         axisSize: 'auto',
                         tickMarksColor: '#888888'
                     },
                     series: [
+                        //set the data line
                         {dataField: 'maintemp', displayText: 'Temp (Kelvin)' },
                         {dataField: 'maintempmin', displayText: 'Temp Min (Kelvin)'},
                         {dataField: 'maintempmax', displayText: 'Temp Max (Kelvin)'}

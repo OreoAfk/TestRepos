@@ -27,51 +27,59 @@ app.use('/jqwidgets', express.static(__dirname + '/node_modules/jqwidgets-framew
 app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 app.use(bodyParser.json());
-
+//set the timer for each 20 min do task
 var timerTask = {schedules : [{m:[10,30,50] }]};
-
+//server port 8080 or 3000
 var post = process.env.PORT || 3000;
 app.listen(post,function(err){
     if(err){
         console.error(err)
     }else{
         console.log('App is ready at :'+post)
+        //start to get the weather data
         later.setInterval(sphinxWeather,timerTask);
         later.date.localTime();
     }
 });
 
 app.get("/",function (req, res) {
+    //checking the cookies is here
     if (req.cookies.remember) {
         console.log(req.cookies.remember);
         console.log("permission:"+req.cookies.remember.per);
+        //check user permission
         if(req.cookies.remember.per=="A"){
-        console.log("permission:"+req.cookies.remember.per);
+            //admin
+            console.log("permission:"+req.cookies.remember.per);
+            //open the weather full data table
             res.sendfile('index.html');
         }else if(req.cookies.remember.per=="C"){
-        console.log("permission:"+req.cookies.remember.per);
+            //client
+            console.log("permission:"+req.cookies.remember.per);
+            //open the weather chart 
             res.sendfile('clientPage.html');
         }
     }
     else{
+        //not cookies should open login page 
         res.sendfile('login.html');
     }
 });
+//for the login website to reload the page 
 app.get("/index",function (req, res) {
     res.redirect('/');
 });
-//output city weather json list
 
+//output city weather json list
 app.get("/weather/:city/:sort",function (req, res) {
     MongoClient.connect(mongoWeatherUrl, function(err, db) {
         assert.equal(null, err);
         var city = req.params.city;
+        //set the data sequence for display
         var dtsort = -1;
         if(req.params.sort=="asc"){
             dtsort = 1;
         }
-        //var count = "a";
-        //var result ;
         if(!isEmpty(city)){
             console.log("city search:"+city);
             db.collection('weather').find({"res.name":city}).sort({"res.dt":dtsort}).toArray(function(err,items){
@@ -87,7 +95,7 @@ app.get("/weather/:city/:sort",function (req, res) {
         }
     });
 });
-
+//get the full weather data
 app.get("/weather",function (req, res) {
     MongoClient.connect(mongoWeatherUrl, function(err, db) {
         assert.equal(null, err);
@@ -103,7 +111,7 @@ app.get("/weather",function (req, res) {
             return;
     });
 });
-// get one data
+// get new weather data
 app.get("/currentWeather/:city",function(req, res) {
     var cityname = req.params.city;
     MongoClient.connect(mongoWeatherUrl, function(err, db) {
@@ -141,6 +149,7 @@ app.get("/city",function (req, res) {
     });
 });
 
+//for the admin to do the insert city name into database
 app.get("/inscity/:city",function (req, res) {
     var cityname = req.params.city;
     var currentdate = new Date();
@@ -188,9 +197,12 @@ app.get("/login/:email/:password",function (req, res) {
     });
     
 });
+//for user to register webiste
 app.get("/register",function (req, res) {
     res.sendfile('Register.html');
 });
+
+//for user to register api(website use post action send the data)
 app.post("/register",function (req, res) {
     var user = req.body.txtfirstname+" "+ req.body.txtlastname;
     var pwd = req.body.password;
@@ -201,6 +213,7 @@ app.post("/register",function (req, res) {
     var time = currentdate.getHours() + ":"  + currentdate.getMinutes() + ":" + currentdate.getSeconds();
     MongoClient.connect(mongoUser, function(err, db) {
         assert.equal(null, err);
+        //build the user json object
         db.collection('user').insertOne({
             "user" :{
                 "name":user,
@@ -220,11 +233,10 @@ app.post("/register",function (req, res) {
         });
         
     });
-    //res.send("Register :"+user+","+pwd+","+email);
-    
     
 });
 app.get('/logout',function(req, res) {
+    //delete the cookies
    res.clearCookie('remember');
    res.redirect('/');
 });
@@ -245,7 +257,7 @@ function sphinxWeather(){
     });
   
 }
-
+//get the weather of the city
 function getCityWeather(city){
         request({
             //url: "http://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=31538fe27dd36887159b09eb67838b37",
@@ -283,8 +295,7 @@ function getCityWeather(city){
     });
 }
 
-
-//for testing the function
+//for testing to use
 exports.dbconnect = function(callback){
     MongoClient.connect(mongoWeatherCityUrl, function(err, db) {
         assert.equal(null, err);
@@ -298,6 +309,7 @@ exports.dbconnect = function(callback){
     });
     
 }
+//for testing to use
 exports.getCityWeather = function(city,callback){
     request({
             //url: "http://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=31538fe27dd36887159b09eb67838b37&units=metric",
