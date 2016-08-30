@@ -257,6 +257,8 @@ function sphinxWeather(){
     });
   
 }
+//for github upload replace the lase project
+//http://stackoverflow.com/questions/20939648/issue-pushing-new-code-in-github 
 //get the weather of the city
 function getCityWeather(city){
         request({

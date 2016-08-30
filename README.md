@@ -6,17 +6,14 @@
      `-----'`--' `---'  `----'  `---'  `--'    `--'`-------' `------'
     ----------------------------------------------------------------- 
 
+this project is develop on the cloud9 .
 
-Welcome to your Node.js project on Cloud9 IDE!
+and push to heroku , the example demo : https://orecenassignment3.herokuapp.com/
 
-This chat example showcases how to use `socket.io` with a static `express` server.
+the demo can use the oreo@gmail.com ,password :oreo
 
-## Running the server
+this git is :https://github.com/OreoAfk/TestRepos.git
 
-1) Open `server.js` and start the app by clicking on the "Run" button in the top menu.
+the project is save the data on mlab ,this is the mongodb 
 
-2) Alternatively you can launch the app from the Terminal:
-
-    $ node server.js
-
-Once the server is running, open the project in the shape of 'https://projectname-username.c9.io/'. As you enter your name, watch the Users list (on the left) update. Once you press Enter or Send, the message is shared with all connected clients.
+![alt tag](img/1.png)
